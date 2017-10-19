@@ -7,19 +7,24 @@ import java.io.IOException;
 
 @WebServlet(name = "LoginServlet", urlPatterns = "/login")
 public class LoginServlet extends HttpServlet {
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("/login.jsp").forward(request, response);
-    }
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        boolean validAttempt = username.equals("admin") && password.equals("password");
+        if (username.equals("admin") && password.equals("password")) {
+            request.getSession().setAttribute("user", username);
+            response.sendRedirect("/profile");
+            } else {
+                response.sendRedirect("/login");
+            // request.getRequestDispatcher("login.jsp").forward(request, response);
+        }
+    }
 
-        if (validAttempt) {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // if it's logged in
+        if (request.getSession().getAttribute("user") != null) {
             response.sendRedirect("/profile");
         } else {
-            response.sendRedirect("/login");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }
 }
